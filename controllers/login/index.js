@@ -1,11 +1,14 @@
 var userModel = require('models/user');
-var specs = require('config/specs');
 var secret = require('config/secret');
+var constants = require('helpers/constants');
+var jwt = require('jwt-simple');
 
 var auth = {
     login_user: function(req, res) {
-        var username = req.query.username || '';
-        var password = req.query.password || '';
+        var username = 'shubham';
+        var password = 'bansal';
+        //var username = req.query.username || '';
+        //var password = req.query.password || '';
         if (username == '' || password == '') {
             res.json({
                 "success": false,
@@ -14,7 +17,8 @@ var auth = {
             return;
         }
         auth.validate(username, password, function(err, dbUserObj){
-            if(err) {
+            console.log("called validate");
+            if(err == true) {
                 console.log(err);
                 res.json({
                     'success' : false,
@@ -26,19 +30,19 @@ var auth = {
             if (!dbUserObj) { // If authentication fails, we send a 401 back
 				res.json({
                     "success": false,
-                    "err_msg": 'Invalid Username or password'
+                    "err_msg": err.message
 				});
 				return;
             }
-            
+            //res.json(dbUserObj);
             res.json(generateToken(dbUserObj));
 
         });
     },
 
     validate: function(username, password, callback) {
+        console.log("in validate");
         userModel.validateUser(username, password, function(err, result){
-            console.log("err");
             callback(err, result);
         })
     }
@@ -57,7 +61,7 @@ var auth = {
 function generateToken(user) {
     delete user.password;
     console.log(user);
-    var expires = expiresIn(specs.get('TOKEN_EXPIRE_TIME'));
+    var expires = expiresIn(constants.TOKEN_EXPIRE_TIME);
     
     var token = jwt.encode({
 		exp: expires,
@@ -75,3 +79,5 @@ function expiresIn(numDays) {
 	var dateObj = new Date();
 	return dateObj.setDate(dateObj.getDate() + numDays);
 }
+
+module.exports = auth;

@@ -1,6 +1,5 @@
-var HashMap = require('hashmap');
-var hmap = new HashMap();
+var tables = {
+    user_table : 'users'
+};
 
-hmap.set('user_table','users');
-
-module.exports = hmap;
+module.exports = tables;
