@@ -1,34 +1,50 @@
-var db = require('config/db');
-var db_tables = require('helpers/db_tables');
+var db_tables = require('helpers/dbTables');
 var mongo = require('mongodb');
 var constants = require('helpers/constants');
 
 var userModel = {
     validateUser: function(username, password, callback) {
-        console.log("in usermodel/validateuser validate");
-        getUserById(username, function(err, row) {
-            result = row;
-            console.log("called usermodel/getuserbyid");
-            console.log(row);
+        getUserById(username, function(err, result) {
             if (err){
                 callback({'message' : 'Error in MongoDB query'}, false);
             }
             else{
                 if(result.length == 1) {
-                    callback(err, row);
+                    callback(err, result);
                 }
                 else {
                     callback({'message' : 'Invalid username or password'}, false);
                 }
             }
         })
+    },
+
+    // register the user if provided username is not present,
+    // otherwise in result, set success: false;
+
+    registerUser: function(user, callback) {
+        getUserById(user.username, function(err, result) {
+            console.log("++++++++++++++");
+            console.log(result);
+            if (err){
+                callback({'message' : 'Error in MongoDB query'}, false);
+            }
+            else if(result.length != 0) {
+                callback({'message' : 'This username is not available'}, false);
+                return;
+            }
+            else {
+                // now put the values in the table.
+                putUserDetailsInTable(user, function(err, res) {
+                    callback(err, res);
+                })
+            }
+        })
     }
 };
 
 function getUserById(username, callback) {
-    
-    console.log('url being hit is ' + constants.DATABASE_SAFE_CHAT_MONGODB_URL);
-    mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
+        mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
         const user_table = db_tables.user_table;
         if(err){
             console.log(err);
@@ -36,14 +52,43 @@ function getUserById(username, callback) {
         }
 
         // searching for required username in the database.
-        var query = { user_name : username };
+        var query = { userName : username };
         var cursor = db.collection(user_table).find(query).toArray(function(err, result){
+            if(err){
+                callback(err, result);
+                return;
+            }
+            db.close();
+            callback(false, result);
+        })
+    });
+}
+
+function putUserDetailsInTable(user, callback) {
+    
+    console.log('url being hit is ' + constants.DATABASE_SAFE_CHAT_MONGODB_URL);
+    mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
+        const user_table = db_tables.user_table;
+        if(err){
+            callback(err, {});
+        }
+
+        // searching for required username in the database.
+        var obj = { 
+            userName : user.username,
+            password : user.password,
+            firstName : user.firstName,
+            middleName : user.middleName,
+            lastName : user.lastName,
+            phone : user.phone,
+            email : user.email
+        };
+        var cursor = db.collection(user_table).insertOne(obj, function(err, result){
             if(err){
                 console.log(err);
                 callback(err, result);
                 return;
             }
-            console.log(result);
             db.close();
             callback(false, result);
         })

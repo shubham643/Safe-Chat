@@ -4,11 +4,9 @@ var constants = require('helpers/constants');
 var jwt = require('jwt-simple');
 
 var auth = {
-    login_user: function(req, res) {
-        var username = 'shubham';
-        var password = 'bansal';
-        //var username = req.query.username || '';
-        //var password = req.query.password || '';
+    loginUser: function(req, res) {
+        var username = req.query.username || '';
+        var password = req.query.password || '';
         if (username == '' || password == '') {
             res.json({
                 "success": false,
@@ -17,7 +15,6 @@ var auth = {
             return;
         }
         auth.validate(username, password, function(err, dbUserObj){
-            console.log("called validate");
             if(err == true) {
                 console.log(err);
                 res.json({
@@ -41,7 +38,6 @@ var auth = {
     },
 
     validate: function(username, password, callback) {
-        console.log("in validate");
         userModel.validateUser(username, password, function(err, result){
             callback(err, result);
         })
