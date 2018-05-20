@@ -15,7 +15,7 @@ var auth = {
             return;
         }
         auth.validate(username, password, function(err, dbUserObj){
-            if(err == true) {
+            if(err) {
                 console.log(err);
                 res.json({
                     'success' : false,

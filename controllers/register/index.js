@@ -26,7 +26,7 @@ var register = {
         }
 
         userModel.registerUser(user, function(err, result) {
-            if (err == true) {
+            if (err) {
                 res.json({
                     success : false,
                     message : err.message

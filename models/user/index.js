@@ -10,7 +10,14 @@ var userModel = {
             }
             else{
                 if(result.length == 1) {
-                    callback(err, result);
+                    verifyResult(username, password, function(err, result) {
+                        if(result.length == 1) {
+                            callback(err, result);
+                        }
+                        else {
+                            callback({'message' : 'Invalid username or password'}, false);
+                        }
+                    });
                 }
                 else {
                     callback({'message' : 'Invalid username or password'}, false);
@@ -44,7 +51,7 @@ var userModel = {
 };
 
 function getUserById(username, callback) {
-        mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
+    mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
         const user_table = db_tables.user_table;
         if(err){
             console.log(err);
@@ -86,6 +93,30 @@ function putUserDetailsInTable(user, callback) {
         var cursor = db.collection(user_table).insertOne(obj, function(err, result){
             if(err){
                 console.log(err);
+                callback(err, result);
+                return;
+            }
+            db.close();
+            callback(false, result);
+        })
+    });
+}
+
+function verifyResult(username, password, callback) {
+    mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
+        const user_table = db_tables.user_table;
+        if(err){
+            console.log(err);
+            callback(err, {});
+        }
+
+        // searching for required username in the database.
+        var query = { 
+            userName : username,
+            password : password
+        };
+        var cursor = db.collection(user_table).find(query).toArray(function(err, result){
+            if(err){
                 callback(err, result);
                 return;
             }
