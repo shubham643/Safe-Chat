@@ -5,7 +5,7 @@ var constants = require('helpers/constants');
 
 var register = {
 
-    registerUser: function(req, res){
+    registerUser: function(req, res) {
         var username = req.query.username || '';
         var password = req.query.password || '';
         var firstName = req.query.firstName || '';
