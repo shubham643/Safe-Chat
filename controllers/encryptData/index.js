@@ -1,5 +1,5 @@
-var keysModel = require('models/keyDetails/keysModel');
-var keysDetails = require('models/keyDetails')
+var keyDetails = require('models/keyDetails')
+var crypto = require('crypto');
 
 var encryptData = {
     encrypt: function(req, res) {
@@ -36,14 +36,28 @@ var encryptData = {
     fetchKeyAndEncryptData: function(username, plainText, keyName, callback) {
 
         // Fetch the key firstly, then encrypt the data with this.
-        keysDetails.fetchKey(username, keyName, function(err, result) {
+        keyDetails.fetchKey(username, keyName, function(err, result) {
             if(err) {
                 callback(err, result);
             }
+            else {
+                // Add logic to encrypt the data from the retrieved key.
+                // @TODO: this is a sample code, correct it and handle exceptions too.
+                var mykey = crypto.createCipher('aes-128-cbc', result.keyID);
+                var mystr = mykey.update(plainText, 'utf8', 'hex')
+                mystr += mykey.final('hex');
 
-            // Add logic to encrypt the data from the retrieved key.
-            console.log("the result after fetching the key is: " + result);
-            callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username);
+                console.log('after encryption: ' + mystr); //plainText
+
+                var mykeys = crypto.createDecipher('aes-128-cbc', result.keyID);
+                var mystrs = mykeys.update(mystr, 'hex', 'utf8')
+                mystrs += mykeys.final('utf8');
+
+                console.log('after decryption: ' + mystrs); //plainText
+
+                console.log("the result after fetching the key is: " + result);
+                callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username + ' encrypted string: ' + mystr + ' decrypted string: ' + mystrs);
+            }
         });
     }
 };

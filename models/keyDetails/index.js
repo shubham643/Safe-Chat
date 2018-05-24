@@ -19,27 +19,55 @@ function fetchKeyFromKeyName(username, keyName, callback) {
             callback(err, {});
         }
 
+        // @TODO: remove this part of code, this is for testing only.
+        // var encryptAccess = ['shubham', 'simran'];
+        // var decryptAccess = ['shubham', 'simran']
+        // var temp = {
+        //     keyName : "hahaKeyName",
+        //     owner : "shubham",
+        //     keyID : "tempKeyID",
+        //     creationDate : "01/01/2018",
+        //     encryptAccess : encryptAccess,
+        //     decryptAccess : decryptAccess,
+        // };
+        // var cursor = db.collection(keys_table).insertOne(temp, function(err, result){
+        //     if(err){
+        //         console.log(err);
+        //         callback(err, result);
+        //     }
+        // });
+
+
+
         // searching for required username in the database.
         var query = {
             keyName : keyName,
         };
         var cursor = db.collection(keys_table).find(query).toArray(function(err, result){
-            if(err || result.length != 1) {
+            if(err) {
                 db.close();
                 callback({'message' : 'Invalid KeyName'}, false);
-                return;
             }
-            var found = (result[0].encryptAccess).find(function(element) {
-                return element == username;
-            });
-            if(found == username) {
-                result = {
-                    keyName : keyName,
-                    keyID : result[0].keyID
-                };
-                callback(false, result);
+            if(result.length != 1) {
+                console.log("length of result is " + result.length);
+                db.close();
+                callback({'message' : 'from second Invalid KeyName'}, false);
             }
-            callback({'message' : 'Username do not have access to encrypt using key: ' + keyName} , false);
+            else {
+                var found = (result[0].encryptAccess).find(function(element) {
+                    return element == username;
+                });
+                if(found == username) {
+                    result = {
+                        keyName : keyName,
+                        keyID : result[0].keyID
+                    };
+                    callback(false, result);
+                }
+                else {
+                    callback({'message' : 'Username do not have access to encrypt using key: ' + keyName} , false);
+                }
+            }
         });
     });
 }
