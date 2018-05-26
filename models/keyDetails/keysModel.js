@@ -1,5 +1,5 @@
 function Keys(keyName, keyID, owner, creationDate, encryptAccess, decryptAccess) {
-    this.keyName = name;
+    this.keyName = keyName;
     this.keyID = keyID;
     this.owner = owner;
     this.creationDate = creationDate;

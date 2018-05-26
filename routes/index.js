@@ -3,6 +3,7 @@ var router = express.Router();
 var auth = require('controllers/login');
 var register = require('controllers/register');
 var encryptData = require('controllers/encryptData');
+var createKey = require('controllers/createKey');
 
 // @TODO: add the middleware for validating the token.
 //var controllers = require('helpers/controllerRegistry');
@@ -21,6 +22,10 @@ router.use('/login', auth.loginUser);
 
 // For registering a new user.
 router.use('/register', register.registerUser);
+
+// For creating a new key.
+// @TODO: give method name.
+router.use('/createKey', createKey.create);
 
 // For encrypting data.
 router.use('/encrypt', encryptData.encrypt);

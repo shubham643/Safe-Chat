@@ -25,7 +25,7 @@ var register = {
             return;
         }
 
-        userModel.registerUser(user, function(err, result) {
+        register.createUserAndRegister(user, function(error, result) {
             if (err) {
                 res.json({
                     success : false,
@@ -36,10 +36,18 @@ var register = {
             else {
                 res.json({
                     success : true,
+                    username : username
                 });
                 return;
             }
-        })
+        });
+    },
+
+    // stores the data in the database.
+    createUserAndRegister: function(user, callback) {
+        userModel.registerUser(user, function(err, result) {
+            callback(err, result);
+        });
     }
 }
 

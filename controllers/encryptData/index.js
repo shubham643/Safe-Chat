@@ -41,22 +41,26 @@ var encryptData = {
                 callback(err, result);
             }
             else {
-                // Add logic to encrypt the data from the retrieved key.
-                // @TODO: this is a sample code, correct it and handle exceptions too.
-                var mykey = crypto.createCipher('aes-128-cbc', result.keyID);
-                var mystr = mykey.update(plainText, 'utf8', 'hex')
-                mystr += mykey.final('hex');
+                try {
+                    // Add logic to encrypt the data from the retrieved key.
+                    // @TODO: this is a sample code, correct it and handle exceptions too.
+                    var mykey = crypto.createCipher('aes-128-cbc', result.keyID);
+                    var mystr = mykey.update(plainText, 'utf8', 'hex')
+                    mystr += mykey.final('hex');
 
-                console.log('after encryption: ' + mystr); //plainText
+                    console.log('after encryption: ' + mystr); //plainText
 
-                var mykeys = crypto.createDecipher('aes-128-cbc', result.keyID);
-                var mystrs = mykeys.update(mystr, 'hex', 'utf8')
-                mystrs += mykeys.final('utf8');
+                    var mykeys = crypto.createDecipher('aes-128-cbc', result.keyID);
+                    var mystrs = mykeys.update(mystr, 'hex', 'utf8')
+                    mystrs += mykeys.final('utf8');
 
-                console.log('after decryption: ' + mystrs); //plainText
+                    console.log('after decryption: ' + mystrs); //plainText
 
-                console.log("the result after fetching the key is: " + result);
-                callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username + ' encrypted string: ' + mystr + ' decrypted string: ' + mystrs);
+                    console.log("the result after fetching the key is: " + result);
+                    callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username + ' encrypted string: ' + mystr + ' decrypted string: ' + mystrs);                
+                } catch (exception) {
+                    throw new Error("Exception thrown while encyption: " + exception.message);
+                }
             }
         });
     }
