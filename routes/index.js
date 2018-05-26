@@ -4,6 +4,7 @@ var auth = require('controllers/login');
 var register = require('controllers/register');
 var encryptData = require('controllers/encryptData');
 var createKey = require('controllers/createKey');
+var decryptData = require('controllers/decryptData');
 
 // @TODO: add the middleware for validating the token.
 //var controllers = require('helpers/controllerRegistry');
@@ -24,10 +25,12 @@ router.use('/login', auth.loginUser);
 router.use('/register', register.registerUser);
 
 // For creating a new key.
-// @TODO: give method name.
 router.use('/createKey', createKey.create);
 
 // For encrypting data.
 router.use('/encrypt', encryptData.encrypt);
+
+// For decrypting the data.
+router.use('/decrypt', decryptData.decrypt);
 
 module.exports = router;

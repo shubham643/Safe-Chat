@@ -1,10 +1,11 @@
 var db_tables = require('helpers/dbTables');
 var mongo = require('mongodb');
 var constants = require('helpers/constants');
+var actions = require('helpers/actions');
 
 var keysModel = {
 
-    fetchKey: function(username, keyName, callback) {
+    fetchKey: function(username, keyName, action, callback) {
         fetchKeyFromKeyName(keyName, function(err, result) {
 
             if(err) {
@@ -15,9 +16,20 @@ var keysModel = {
                 callback({'message' : 'Invalid KeyName'}, false);
             }
             else {
-                var found = (result[0].encryptAccess).find(function(element) {
-                    return element == username;
-                });
+                var found;
+                if(action == actions.ENCRYPT) {
+                    found = (result[0].encryptAccess).find(function(element) {
+                        return element == username;
+                    });
+                }
+                else if(action == actions.DECRYPT) {
+                    found = (result[0].decryptAccess).find(function(element) {
+                        return element == username;
+                    });
+                }
+                else {
+                    callback({message : 'invalid action performed'}, false);
+                }
                 if(found == username) {
                     result = {
                         keyName : keyName,
@@ -26,7 +38,7 @@ var keysModel = {
                     callback(false, result);
                 }
                 else {
-                    callback({'message' : 'Username do not have access to encrypt using key: ' + keyName} , false);
+                    callback({'message' : 'Username do not have access to perform this action using key: ' + keyName} , false);
                 }
             }
         });
@@ -62,11 +74,13 @@ function createNewKey(key, callback) {
         var query = {
             keyName : key.keyName,
             owner : key.owner,
-            creationDate : key.createDate,
+            creationDate : key.creationDate,
             keyID : key.keyID,
             encryptAccess : key.encryptAccess,
             decryptAccess : key.decryptAccess
         };
+
+        console.log('newly created key is: %j', query);
         var cursor = db.collection(keys_table).insertOne(query, function(err, result){
             db.close();
             if(err) {

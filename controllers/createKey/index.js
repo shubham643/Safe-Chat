@@ -26,7 +26,7 @@ var createKey = {
             else {
                 res.json({
                     "success": true,
-                    "keyName": result
+                    "keyDetails": result
                 });
                 return;
             }
@@ -45,7 +45,7 @@ var createKey = {
         const hash = crypto.createHash('sha256');
         hash.update(keyName);
         const keyID = hash.digest('hex');
-        console.log('hash of keyName i.e. keyID is ' + keyID);
+        console.log('hash of keyName i.e. keyID is ' + keyID + ' and date is ' + creationDate);
 
         var key = new keysModel(keyName, keyID, owner, creationDate, encryptAccess, decryptAccess);
         keyDetails.createKey(key, function(err, result) {
