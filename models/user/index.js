@@ -4,23 +4,16 @@ var constants = require('helpers/constants');
 
 var userModel = {
     validateUser: function(username, password, callback) {
-        getUserById(username, function(err, result) {
+        getUserByUsername(username, function(err, result) {
             if (err){
                 callback({'message' : 'Error in MongoDB query'}, false);
             }
-            else{
-                if(result.length == 1) {
-                    verifyResult(username, password, function(err, result) {
-                        if(result.length == 1) {
-                            callback(err, result);
-                        }
-                        else {
-                            callback({'message' : 'Invalid username or password'}, false);
-                        }
-                    });
+            else {
+                if(result.length != 1 || result[0].password != password) {
+                    callback({'message' : 'Invalid username or password'}, false);
                 }
                 else {
-                    callback({'message' : 'Invalid username or password'}, false);
+                    callback(false, result[0]);
                 }
             }
         })
@@ -30,15 +23,12 @@ var userModel = {
     // otherwise in result, set success: false;
 
     registerUser: function(user, callback) {
-        getUserById(user.username, function(err, result) {
-            console.log("++++++++++++++");
-            console.log(result);
+        getUserByUsername(user.username, function(err, result) {
             if (err){
                 callback({'message' : 'Error in MongoDB query'}, false);
             }
             else if(result.length != 0) {
                 callback({'message' : 'This username is not available'}, false);
-                return;
             }
             else {
                 // now put the values in the table.
@@ -50,7 +40,7 @@ var userModel = {
     }
 };
 
-function getUserById(username, callback) {
+function getUserByUsername(username, callback) {
     mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
         const user_table = db_tables.user_table;
         if(err){
@@ -72,8 +62,6 @@ function getUserById(username, callback) {
 }
 
 function putUserDetailsInTable(user, callback) {
-    
-    console.log('url being hit is ' + constants.DATABASE_SAFE_CHAT_MONGODB_URL);
     mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
         const user_table = db_tables.user_table;
         if(err){
@@ -93,30 +81,6 @@ function putUserDetailsInTable(user, callback) {
         var cursor = db.collection(user_table).insertOne(obj, function(err, result){
             if(err){
                 console.log(err);
-                callback(err, result);
-                return;
-            }
-            db.close();
-            callback(false, result);
-        })
-    });
-}
-
-function verifyResult(username, password, callback) {
-    mongo.connect(constants.DATABASE_SAFE_CHAT_MONGODB_URL, function(err, db){
-        const user_table = db_tables.user_table;
-        if(err){
-            console.log(err);
-            callback(err, {});
-        }
-
-        // searching for required username in the database.
-        var query = { 
-            userName : username,
-            password : password
-        };
-        var cursor = db.collection(user_table).find(query).toArray(function(err, result){
-            if(err){
                 callback(err, result);
                 return;
             }

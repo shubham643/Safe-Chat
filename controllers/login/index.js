@@ -23,14 +23,7 @@ var auth = {
                 });
                 return;
             }
-
-            if (!dbUserObj) { // If authentication fails, we send a 401 back
-				res.json({
-                    "success": false,
-                    "err_msg": err.message
-				});
-				return;
-            }
+            console.log('result obtained is %j', dbUserObj);
             //res.json(dbUserObj);
             res.json(generateToken(dbUserObj));
 
