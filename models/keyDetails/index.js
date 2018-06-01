@@ -10,10 +10,12 @@ var keysModel = {
 
             if(err) {
                 callback({'message' : 'Error in mongoDB query'}, false);
+                return;
             }
             if(result.length != 1) {
                 console.log("length of result is " + result.length);
                 callback({'message' : 'Invalid KeyName'}, false);
+                return;
             }
             else {
                 var found;
@@ -27,8 +29,33 @@ var keysModel = {
                         return element == username;
                     });
                 }
+                else if(action == actions.REQUEST_KEY_ACCESS) {
+                    encryptAccess = (result[0].encryptAccess).find(function(element) {
+                        return element == username;
+                    });
+                    decryptAccess = (result[0].decryptAccess).find(function(element) {
+                        return element == username;
+                    });
+
+                    result = {
+                        keyName : keyName,
+                        owner : result[0].owner,
+                        encryptAccess : false,
+                        decryptAccess : false
+                    };
+
+                    if(encryptAccess == username) {
+                        result['encryptAccess'] = true;
+                    }
+                    if(decryptAccess == username) {
+                        result['decryptAccess'] = true;
+                    }
+                    callback(false, result);
+                    return;
+                }
                 else {
                     callback({message : 'invalid action performed'}, false);
+                    return;
                 }
                 if(found == username) {
                     result = {
@@ -36,9 +63,11 @@ var keysModel = {
                         keyID : result[0].keyID
                     };
                     callback(false, result);
+                    return;
                 }
                 else {
                     callback({'message' : 'Username do not have access to perform this action using key: ' + keyName} , false);
+                    return;
                 }
             }
         });

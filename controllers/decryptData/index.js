@@ -1,6 +1,6 @@
-var keyDetails = require('models/keyDetails')
+var keyDetails = require('models/keyDetails');
 var crypto = require('crypto');
-var actions = require('helpers/actions')
+var actions = require('helpers/actions');
 
 var decryptData = {
     decrypt: function(req, res) {
@@ -36,10 +36,11 @@ var decryptData = {
 
     fetchKeyAndDecryptData: function(username, encryptedText, keyName, callback) {
 
-        // Fetch the key firstly, then encrypt the data with this.
+        // Fetch the key firstly, then decrypt the data with this.
         keyDetails.fetchKey(username, keyName, actions.DECRYPT, function(err, result) {
             if(err) {
                 callback(err, result);
+                return;
             }
             else {
                 try {
@@ -52,7 +53,8 @@ var decryptData = {
                     console.log('after decryption: ' + mystr); //plainText
 
                     console.log("the result after fetching the key is: " + result);
-                    callback(false, 'encrypted data is: ' + encryptedText + ' and username is: ' + username + 'decrypted string: ' + mystr);                
+                    callback(false, 'encrypted data is: ' + encryptedText + ' and username is: ' + username + 'decrypted string: ' + mystr);
+                    return;            
                 } catch (exception) {
                     throw new Error("Exception thrown while encyption: " + exception.message);
                 }

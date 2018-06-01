@@ -42,6 +42,7 @@ var encryptData = {
         keyDetails.fetchKey(username, keyName, actions.ENCRYPT, function(err, result) {
             if(err) {
                 callback(err, result);
+                return;
             }
             else {
                 try {
@@ -59,7 +60,8 @@ var encryptData = {
                     console.log('after decryption: ' + mystrs); //plainText
 
                     console.log("the result after fetching the key is: " + result);
-                    callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username + ' encrypted string: ' + mystr + ' decrypted string: ' + mystrs);                
+                    callback(false, 'encrypted data is: ' + plainText + ' and username is: ' + username + ' encrypted string: ' + mystr + ' decrypted string: ' + mystrs);
+                    return;          
                 } catch (exception) {
                     throw new Error("Exception thrown while encyption: " + exception.message);
                 }

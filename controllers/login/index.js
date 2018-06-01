@@ -33,6 +33,7 @@ var auth = {
     validate: function(username, password, callback) {
         userModel.validateUser(username, password, function(err, result){
             callback(err, result);
+            return;
         })
     }
 };

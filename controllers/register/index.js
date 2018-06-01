@@ -47,6 +47,7 @@ var register = {
     createUserAndRegister: function(user, callback) {
         userModel.registerUser(user, function(err, result) {
             callback(err, result);
+            return;
         });
     }
 }

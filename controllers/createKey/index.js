@@ -50,6 +50,7 @@ var createKey = {
         var key = new keysModel(keyName, keyID, owner, creationDate, encryptAccess, decryptAccess);
         keyDetails.createKey(key, function(err, result) {
             callback(err, result);
+            return;
         });
     }
 }
