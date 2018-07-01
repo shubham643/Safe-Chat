@@ -6,6 +6,7 @@ var encryptData = require('controllers/encryptData');
 var createKey = require('controllers/createKey');
 var decryptData = require('controllers/decryptData');
 var requestKeyAccess = require('controllers/requestKeyAccess');
+var constants = require('helpers/constants');
 
 // @TODO: add the middleware for validating the token.
 //var controllers = require('helpers/controllerRegistry');
@@ -19,22 +20,23 @@ router.get('/', function(req, res, next) {
  * Routes that can be accessed by any one
  */
 
- // For login of the username
+// For login of the username
+// validateRequest middleware is not required for login as there is no token till now.
 router.use('/login', auth.loginUser);
 
 // For registering a new user.
-router.use('/register', register.registerUser);
+router.use(constants.BASE_PATH + '/register', register.registerUser);
 
 // For creating a new key.
-router.use('/createKey', createKey.create);
+router.use(constants.BASE_PATH + '/createKey', createKey.create);
 
 // For encrypting data.
-router.use('/encrypt', encryptData.encrypt);
+router.use(constants.BASE_PATH + '/encrypt', encryptData.encrypt);
 
 // For decrypting the data.
-router.use('/decrypt', decryptData.decrypt);
+router.use(constants.BASE_PATH + '/decrypt', decryptData.decrypt);
 
 // For requesting access to key.
-router.use('/requestKeyAccess', requestKeyAccess.requestAccess);
+router.use(constants.BASE_PATH + '/requestKeyAccess', requestKeyAccess.requestAccess);
 
 module.exports = router;

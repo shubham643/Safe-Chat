@@ -24,6 +24,13 @@ app.use(logger('dev'));
 //   }
 // });
 
+// Auth Middleware - This will check if the token is valid
+// Only the requests that start with /safechat/* will be checked for the token.
+// Any URL's that do not follow the below pattern should be avoided unless you 
+// are sure that authentication is not needed
+app.all('/safechat/*',[require('./middlewares/validateRequest')]);
+
+
 app.use('/', require('./routes/index.js'));
 
 // catch 404 and forward to error handler
